@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26621.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieDesktop", "MovieDesktop.csproj", "{91A7DBA8-D7C7-4568-8370-0570225AFE97}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91A7DBA8-D7C7-4568-8370-0570225AFE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91A7DBA8-D7C7-4568-8370-0570225AFE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91A7DBA8-D7C7-4568-8370-0570225AFE97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91A7DBA8-D7C7-4568-8370-0570225AFE97}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {467D4D28-C08D-48F6-8994-BB1F495B2D79}
+	EndGlobalSection
+EndGlobal
