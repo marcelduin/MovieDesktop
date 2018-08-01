@@ -20,10 +20,13 @@ namespace MovieDesktop
     [STAThread]
     static void Main(string[] args)
     {
-      string videoSrc = "./test/ejmj6Eq.mp4";
+      if (args.Length < 1) throw new ArgumentException("No input file or url given");
 
-      //videoSrc = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4";
-      int screenIdx = 1;
+      string videoSrc = args[0];
+
+      int screenIdx = 0;
+      if (args.Length == 2) Int32.TryParse(args[1], out screenIdx);
+
 
       //Application.EnableVisualStyles();
       Application.Run(new Player(videoSrc, screenIdx));
