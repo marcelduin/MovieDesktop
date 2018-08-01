@@ -1,23 +1,43 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Vlc.DotNet.Forms;
 
 namespace MovieDesktop
 {
-  class Program : Form
+  class Player : Form
   {
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr GetShellWindow();
+
+
     private VlcControl video;
 
     [STAThread]
     static void Main(string[] args)
     {
-      Application.EnableVisualStyles();
-      Application.Run(new Program());
+      string videoSrc = "test/ejmj6Eq.mp4";
+      int screenIdx = 1;
+
+      //Application.EnableVisualStyles();
+      Application.Run(new Player(videoSrc, screenIdx));
     }
 
-    public Program()
+
+    public Player(string videoSrc, int screenIdx = 0)
     {
+      var desktop = GetShellWindow();
+
+      if(desktop == IntPtr.Zero)
+      {
+        Console.Error.WriteLine("Desktop process not found.");
+        throw new Exception("Desktop process not found.");
+      }
+
       var vlcPath = new DirectoryInfo("C:\\Program Files\\VideoLAN\\VLC");
       if (!vlcPath.Exists)
       {
@@ -29,29 +49,26 @@ namespace MovieDesktop
         }
       }
 
-      // TODO make this variable
-      var file = new FileInfo("test/ejmj6Eq.mp4");
+      var file = new FileInfo(videoSrc);
       if (!file.Exists)
       {
         Console.Error.WriteLine("Doesn't exist dude");
         throw new FileNotFoundException("Video file doesn't exist!");
       }
 
-      // Forms part
+      /// Forms part
       Text = "Fullscreen desktop movie";
       FormBorderStyle = FormBorderStyle.None;
-      WindowState = FormWindowState.Maximized;
-      //TopMost = false
 
-      // Video part
+      /// Video part
       video = new VlcControl
       {
         VlcLibDirectory = vlcPath
       };
       video.EndInit();
 
-      // This ought to be enough for everybody
-      video.SetMedia(file, new string[]{"input-repeat=65535"});
+      // Loop infinitely
+      video.SetMedia(file, new string[]{"input-repeat=-1"});
 
       // No audio
       video.Audio.IsMute = true;
@@ -65,14 +82,33 @@ namespace MovieDesktop
       // Add to main form
       Controls.Add(video);
 
-      // Watch program resize
-      Resize += (sender, e) => {
-        video.Width = Width;
-        video.Height = Height;
-      };
 
-      // Play video
-      video.Play();
+      /// Screen part
+      // Try to get preferred screen, otherwise just get first
+      var screen = screenIdx < Screen.AllScreens.Count() ? Screen.AllScreens[screenIdx] : Screen.AllScreens.First();
+
+      video.Width = Width = screen.WorkingArea.Width;
+      video.Height = Height = screen.WorkingArea.Height;
+
+      // Desktop Window has [0,0] as top left screen.. get top and left for selected screen
+      int top = 0;
+      int left = 0;
+      foreach (Screen s in Screen.AllScreens.Where(s => s != screen))
+      {
+        top += Math.Max(0, -s.WorkingArea.Top);
+        left += Math.Max(0, -s.WorkingArea.Left);
+      }
+
+      Load += new EventHandler((s, e) =>
+      {
+        Top = top;
+        Left = left;
+        SetParent(Handle, desktop);
+
+        // Play video
+        video.Play();
+      });
+
     }
 
   }
