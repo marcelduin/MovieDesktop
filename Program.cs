@@ -14,7 +14,6 @@ namespace MovieDesktop
     [DllImport("user32.dll", SetLastError = true)]
     static extern IntPtr GetShellWindow();
 
-
     private VlcControl video;
 
     [STAThread]
@@ -44,7 +43,7 @@ namespace MovieDesktop
       }
 
       var vlcPath = new DirectoryInfo("C:\\Program Files\\VideoLAN\\VLC");
-      if (!vlcPath.Exists)
+      if (!vlcPath.Exists || !Environment.Is64BitProcess)
       {
         vlcPath = new DirectoryInfo("C:\\Program Files (x86)\\VideoLAN\\VLC");
 
@@ -82,7 +81,7 @@ namespace MovieDesktop
       video.EndInit();
 
       // Loop infinitely
-      video.SetMedia(videoSrc, new string[]{"input-repeat=-1"});
+      video.SetMedia(videoSrc, new string[]{"input-repeat=65535"});
 
       // No audio
       video.Audio.IsMute = true;
