@@ -42,15 +42,14 @@ namespace MovieDesktop
         throw new Exception("Desktop process not found.");
       }
 
-      var vlcPath = new DirectoryInfo("C:\\Program Files\\VideoLAN\\VLC");
-      if (!vlcPath.Exists || !Environment.Is64BitProcess)
-      {
-        vlcPath = new DirectoryInfo("C:\\Program Files (x86)\\VideoLAN\\VLC");
+      bool isX86 = IntPtr.Size == 4;
+      Console.WriteLine("Running in " + (isX86 ? "32-bit" : "64-bit"));
 
-        if (!vlcPath.Exists)
-        {
-          throw new EntryPointNotFoundException("VLC not found on your system.");
-        }
+      var vlcPath = new DirectoryInfo(isX86 ? "C:\\Program Files (x86)\\VideoLAN\\VLC" : "C:\\Program Files\\VideoLAN\\VLC");
+      if (!vlcPath.Exists)
+      {
+        Console.Error.WriteLine("Error: " + (isX86 ? "32-bit" : "64-bit") + " version of VLC not found on your system. Please install.");
+        throw new EntryPointNotFoundException("VLC not found on your system.");
       }
 
 
