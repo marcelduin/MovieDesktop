@@ -21,18 +21,14 @@ namespace MovieDesktop
     {
       if (args.Length < 1) throw new ArgumentException("No input file or url given");
 
-      string videoSrc = args[0];
+      uint screenNum = 1;
+      if (args.Length == 2) UInt32.TryParse(args[1], out screenNum);
 
-      int screenIdx = 0;
-      if (args.Length == 2) Int32.TryParse(args[1], out screenIdx);
-
-
-      //Application.EnableVisualStyles();
-      Application.Run(new Player(videoSrc, screenIdx));
+      Application.Run(new Player(args[0], screenNum-1));
     }
 
 
-    public Player(string videoSrc, int screenIdx = 0)
+    public Player(string videoSrc, uint screenIdx = 0)
     {
       var desktop = GetShellWindow();
 

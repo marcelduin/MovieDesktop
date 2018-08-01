@@ -7,7 +7,7 @@ Allow videos as desktop backgrounds in Windows. You need to have VLC installed (
 
 For example, to open an imgur mp4 as background on your second screen:
 
-    MovieDesktop.exe https://i.imgur.com/VMb5aPE.mp4 1
+    MovieDesktop.exe https://i.imgur.com/VMb5aPE.mp4 2
 
 ## Roadmap
 * Adding binary distributions
