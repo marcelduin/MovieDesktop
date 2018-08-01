@@ -20,7 +20,9 @@ namespace MovieDesktop
     [STAThread]
     static void Main(string[] args)
     {
-      string videoSrc = "test/ejmj6Eq.mp4";
+      string videoSrc = "./test/ejmj6Eq.mp4";
+
+      //videoSrc = "http://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4";
       int screenIdx = 1;
 
       //Application.EnableVisualStyles();
@@ -49,12 +51,21 @@ namespace MovieDesktop
         }
       }
 
-      var file = new FileInfo(videoSrc);
-      if (!file.Exists)
+
+      // If non-url given, check if local file exists
+      if (!videoSrc.StartsWith("http"))
       {
-        Console.Error.WriteLine("Doesn't exist dude");
-        throw new FileNotFoundException("Video file doesn't exist!");
+        FileInfo file = new FileInfo(videoSrc);
+        if (!file.Exists)
+        {
+          Console.Error.WriteLine("Doesn't exist dude");
+          throw new FileNotFoundException("Video file doesn't exist!");
+        }
+
+        // Convert to file:// format
+        videoSrc = new Uri(file.FullName).AbsoluteUri;
       }
+
 
       /// Forms part
       Text = "Fullscreen desktop movie";
@@ -68,7 +79,7 @@ namespace MovieDesktop
       video.EndInit();
 
       // Loop infinitely
-      video.SetMedia(file, new string[]{"input-repeat=-1"});
+      video.SetMedia(videoSrc, new string[]{"input-repeat=-1"});
 
       // No audio
       video.Audio.IsMute = true;
@@ -77,6 +88,7 @@ namespace MovieDesktop
       video.EncounteredError += (sender, e) =>
       {
         Console.Error.Write("An error occurred - " + e);
+        throw new Exception(e.ToString());
       };
 
       // Add to main form
