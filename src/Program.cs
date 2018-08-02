@@ -7,35 +7,40 @@ using Vlc.DotNet.Forms;
 
 namespace MovieDesktop
 {
-  class Player : Form
+  class Player : VlcControl
   {
-    private VlcControl video;
-
     [STAThread]
     static void Main(string[] args)
     {
-#if DEBUG
-      // Sample video on first screen
-      Application.Run(new Player("https://i.imgur.com/VMb5aPE.mp4", 0));
-#else
-      if (args.Length < 1) throw new ArgumentException("No input file or url given");
+      string source = "";
       uint screenNum = 1;
-      if (args.Length == 2) UInt32.TryParse(args[1], out screenNum);
+#if DEBUG
+      source = "https://i.imgur.com/VMb5aPE.mp4"; // Sample video
+#else
+      if (args.Length < 1 || String.IsNullorWhiteSpace(args[0]))
+        throw new ArgumentException("No input file or url given");
 
-      Application.Run(new Player(args[0], screenNum-1));
+      source = args[0];
+
+      if (args.Length == 2) UInt32.TryParse(args[1], out screenNum);
 #endif
+
+      Application.Run(new Player(source, screenNum-1).FindForm());
     }
 
     public Player(string videoSrc, uint screenIdx = 0)
     {
-      var desktop = GetWorkerW();
+      Text = "Fullscreen desktop movie";
 
+      // Get the desktop process
+      var desktop = GetWorkerW();
       if(desktop == IntPtr.Zero)
       {
         Console.Error.WriteLine("Desktop process not found.");
         throw new Exception("Desktop process not found.");
       }
 
+      // Get VLC libraries
       bool isX86 = IntPtr.Size == 4;
       Console.WriteLine("Running in " + (isX86 ? "32-bit" : "64-bit"));
 
@@ -46,6 +51,9 @@ namespace MovieDesktop
         throw new EntryPointNotFoundException("VLC not found on your system.");
       }
 
+      VlcLibDirectory = vlcPath;
+      EndInit();
+
 
       // If non-url given, check if local file exists
       if (!videoSrc.StartsWith("http"))
@@ -53,7 +61,7 @@ namespace MovieDesktop
         FileInfo file = new FileInfo(videoSrc);
         if (!file.Exists)
         {
-          Console.Error.WriteLine("Doesn't exist dude");
+          Console.Error.WriteLine("File doesn't exist");
           throw new FileNotFoundException("Video file doesn't exist!");
         }
 
@@ -61,41 +69,25 @@ namespace MovieDesktop
         videoSrc = new Uri(file.FullName).AbsoluteUri;
       }
 
-
-      /// Forms part
-      Text = "Fullscreen desktop movie";
-      FormBorderStyle = FormBorderStyle.None;
-
-      /// Video part
-      video = new VlcControl
-      {
-        VlcLibDirectory = vlcPath
-      };
-      video.EndInit();
-
-      // Loop infinitely
-      video.SetMedia(videoSrc, new string[]{"input-repeat=65535"});
+      // Set media and loop infinitely (65535 instead of -1 due to a bug in some VLCs)
+      SetMedia(videoSrc, new string[]{"input-repeat=65535"});
 
       // No audio
-      video.Audio.IsMute = true;
+      Audio.IsMute = true;
 
       // Error handling
-      video.EncounteredError += (sender, e) =>
+      EncounteredError += (sender, e) =>
       {
         Console.Error.Write("An error occurred - " + e);
         throw new Exception(e.ToString());
       };
 
-      // Add to main form
-      Controls.Add(video);
-
-
       /// Screen part
       // Try to get preferred screen, otherwise just get first
       var screen = screenIdx < Screen.AllScreens.Count() ? Screen.AllScreens[screenIdx] : Screen.AllScreens.First();
 
-      video.Width = Width = screen.WorkingArea.Width;
-      video.Height = Height = screen.WorkingArea.Height;
+      Width = screen.WorkingArea.Width;
+      Height = screen.WorkingArea.Height;
 
       // Desktop Window has [0,0] as top left screen.. get top and left for selected screen
       int top = 0;
@@ -106,19 +98,65 @@ namespace MovieDesktop
         left += Math.Max(0, -s.WorkingArea.Left);
       }
 
-      Load += new EventHandler((s, e) =>
-      {
-        Top = top;
-        Left = left;
-        SetParent(Handle, desktop);
+      // Set the desktop as parent process
+      SetParent(Handle, desktop);
 
-        // Play video
-        video.Play();
+      // Place the video on the correct screen
+      Top = top;
+      Left = left;
+
+      // Play
+      Play();
+
+      // Watch for ctrl+c
+      SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true);
+
+      // When the program is exited, reset the desktop to original backgrounds
+      Application.ThreadExit += new EventHandler((s, e) =>
+      {
+        Console.WriteLine("gracefully exiting..");
+
+        // Todo fix this. Ending the desktop WorkerW task resets the entire explorer
+        //EndTask(desktop, true, true);
       });
 
     }
 
-    // Imports
+    /// <summary>
+    /// Kill the WorkerW desktop process to remove the custom overlay when exiting program
+    /// From http://geekswithblogs.net/mrnat/archive/2004/09/23/11594.aspx
+    /// </summary>
+    /// <param name="Handler"></param>
+    /// <param name="Add"></param>
+    /// <returns></returns>
+    [DllImport("Shell32.dll")]
+    private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
+    [DllImport("Kernel32.dll")]
+    public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
+    // A delegate type to be used as the handler routine
+    // for SetConsoleCtrlHandler.
+    public delegate bool HandlerRoutine(CtrlTypes CtrlType);
+
+    // An enumerated type for the control messages
+    // sent to the handler routine.
+    public enum CtrlTypes
+    {
+      CTRL_C_EVENT = 0,
+      CTRL_BREAK_EVENT,
+      CTRL_CLOSE_EVENT,
+      CTRL_LOGOFF_EVENT = 5,
+      CTRL_SHUTDOWN_EVENT
+    }
+
+    private static bool ConsoleCtrlCheck(CtrlTypes ctrlType)
+    {
+      Application.Exit();
+      return true;
+    }
+
+    /// <summary>
+    /// All imports required for getting the WorkerW processId
+    /// </summary>
     [Flags]
     enum SendMessageTimeoutFlags : uint
     {
@@ -128,26 +166,20 @@ namespace MovieDesktop
       SMTO_NOTIMEOUTIFNOTHUNG = 0x8,
       SMTO_ERRORONEXIT = 0x20
     }
-    [DllImport("User32", SetLastError = true)]
+    [DllImport("user32.dll", SetLastError = true)]
     static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    static extern IntPtr SendMessageTimeout(
-    IntPtr windowHandle,
-    uint Msg,
-    IntPtr wParam,
-    IntPtr lParam,
-    SendMessageTimeoutFlags flags,
-    uint timeout,
-    out IntPtr result);
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr SendMessageTimeout(IntPtr windowHandle, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags flags, uint timeout, out IntPtr result);
+    [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
     private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-    [DllImport("User32", SetLastError = true)]
+    [DllImport("user32.dll", SetLastError = true)]
     static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
     [DllImport("user32.dll", SetLastError = true)]
     static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern bool EndTask(IntPtr hWnd, bool fShutDown, bool fForce);
     /// <summary>
     /// Get processId of actual desktop background renderer
     /// From https://www.codeproject.com/Articles/856020/Draw-behind-Desktop-Icons-in-Windows
