@@ -1,5 +1,5 @@
 # MovieDesktop
-Allow videos as desktop backgrounds in Windows. You need to have VLC installed (32 bit or 64 bit depending on your system).
+Allow videos as desktop backgrounds in Windows. You need to have [VLC](https://www.videolan.org/vlc/) installed (32 bit or 64 bit depending on your system).
 
 ## Usage
 1. Download the binary zip (32 or 64 bit, depending on which VLC client you have installed) from `./dist/` and unpack, or get the source from `./src/` and compile it in Visual Studio
