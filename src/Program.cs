@@ -17,7 +17,7 @@ namespace MovieDesktop
 #if DEBUG
       source = "https://i.imgur.com/VMb5aPE.mp4"; // Sample video
 #else
-      if (args.Length < 1 || String.IsNullorWhiteSpace(args[0]))
+      if (args.Length < 1 || String.IsNullOrWhiteSpace(args[0]))
         throw new ArgumentException("No input file or url given");
 
       source = args[0];
