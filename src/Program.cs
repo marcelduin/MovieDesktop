@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Vlc.DotNet.Forms;
 
@@ -129,36 +130,45 @@ namespace MovieDesktop
       Play();
 
       // Watch for ctrl+c
-      SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true);
+      SetConsoleCtrlHandler(new HandlerRoutine(ctrlType =>
+      {
+        Application.Exit();
+        return true;
+      }), true);
 
       // When the program is exited, reset the desktop to original backgrounds
       Application.ThreadExit += new EventHandler((s, e) =>
       {
-        Console.WriteLine("gracefully exiting..");
+        Console.WriteLine("Gracefully exiting..");
 
-        // Todo fix this. Ending the desktop WorkerW task resets the entire explorer
-        //EndTask(desktop, true, true);
+        Stop();
+        Dispose();
+
+        // Reset the desktop background image to prevent frozen video or black screen on exit
+        StringBuilder sb = new StringBuilder(300);
+        SystemParametersInfo(SPI_GETDESKWALLPAPER, 300, sb, 0);
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, sb, 0x2);
       });
 
     }
 
-    /// <summary>
-    /// Kill the WorkerW desktop process to remove the custom overlay when exiting program
+
+    /////////////////////////////////////////////////////////
+    // Call for resetting desktop background after exit
+    [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+    public static extern int SystemParametersInfo(int uAction, int uParam, StringBuilder lpvParam, int fuWinIni);
+    public const int SPI_GETDESKWALLPAPER = 0x0073;
+    public const int SPI_SETDESKWALLPAPER = 0x0014;
+
+
+    /////////////////////////////////////////////////////////
+    /// Detect ctrl+c/break
     /// From http://geekswithblogs.net/mrnat/archive/2004/09/23/11594.aspx
-    /// </summary>
-    /// <param name="Handler"></param>
-    /// <param name="Add"></param>
-    /// <returns></returns>
-    [DllImport("Shell32.dll")]
-    private static extern int SHChangeNotify(int eventId, int flags, IntPtr item1, IntPtr item2);
     [DllImport("Kernel32.dll")]
     public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
-    // A delegate type to be used as the handler routine
-    // for SetConsoleCtrlHandler.
+    // A delegate type to be used as the handler routine for SetConsoleCtrlHandler.
     public delegate bool HandlerRoutine(CtrlTypes CtrlType);
-
-    // An enumerated type for the control messages
-    // sent to the handler routine.
+    // An enumerated type for the control messages sent to the handler routine.
     public enum CtrlTypes
     {
       CTRL_C_EVENT = 0,
@@ -168,15 +178,9 @@ namespace MovieDesktop
       CTRL_SHUTDOWN_EVENT
     }
 
-    private static bool ConsoleCtrlCheck(CtrlTypes ctrlType)
-    {
-      Application.Exit();
-      return true;
-    }
-
-    /// <summary>
-    /// All imports required for getting the WorkerW processId
-    /// </summary>
+    /////////////////////////////////////////////////////////
+    /// Get processId of actual desktop background renderer
+    /// From https://www.codeproject.com/Articles/856020/Draw-behind-Desktop-Icons-in-Windows
     [Flags]
     enum SendMessageTimeoutFlags : uint
     {
@@ -198,13 +202,6 @@ namespace MovieDesktop
     static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
     [DllImport("user32.dll", SetLastError = true)]
     static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern bool EndTask(IntPtr hWnd, bool fShutDown, bool fForce);
-    /// <summary>
-    /// Get processId of actual desktop background renderer
-    /// From https://www.codeproject.com/Articles/856020/Draw-behind-Desktop-Icons-in-Windows
-    /// </summary>
-    /// <returns>IntPtr to WorkerW processId</returns>
 
     private static IntPtr GetWorkerW()
     {
@@ -259,7 +256,5 @@ namespace MovieDesktop
 
       return workerw;
     }
-
-
   }
 }
