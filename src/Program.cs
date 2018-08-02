@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -55,11 +56,30 @@ namespace MovieDesktop
       EndInit();
 
 
-      // If non-url given, check if local file exists
+      // If non-url given, check if local file or dir exists
       if (!videoSrc.StartsWith("http"))
       {
         FileInfo file = new FileInfo(videoSrc);
-        if (!file.Exists)
+
+        // If it's a directory, get a random video from in there
+        if (file.Attributes.HasFlag(FileAttributes.Directory))
+        {
+          var rand = new Random();
+          var allowedExtensions = new HashSet<string>(new string[] { ".mp4", ".webm", ".avi" }, StringComparer.OrdinalIgnoreCase);
+          var files = Directory.EnumerateFiles(videoSrc).Where(f => allowedExtensions.Contains(Path.GetExtension(f))).ToArray();
+
+          if (files.Length == 0)
+          {
+            Console.Error.WriteLine("No valid video files (mp4, webm, avi) found in directory!");
+            throw new FileNotFoundException();
+          }
+
+          file = new FileInfo(files[rand.Next(files.Length)]);
+
+          Console.WriteLine("Provided a directory. Random pick: " + file.Name);
+
+        }
+        else if (!file.Exists)
         {
           Console.Error.WriteLine("File doesn't exist");
           throw new FileNotFoundException("Video file doesn't exist!");
