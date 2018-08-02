@@ -3,7 +3,7 @@ Allow videos as desktop backgrounds in Windows. You need to have VLC installed (
 
 ## Usage
 1. Download the binary zip (32 or 64 bit, depending on which VLC client you have installed) from `./dist/` and unpack, or get the source from `./src/` and compile it in Visual Studio
-2. Run from the command line using `MovieDesktop.exe [file or URL of mp4] [optional desktop number]`
+2. Run from the command line using `MovieDesktop.exe [file, directory or URL of mp4] [optional desktop number]`. If a directory is provided, it will pick a random movie file from there.
 
 For example, to open an imgur mp4 as background on your second screen:
 
