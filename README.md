@@ -1,5 +1,5 @@
 # MovieDesktop
-Allow videos as desktop backgrounds in Windows. You need to have [VLC](https://www.videolan.org/vlc/) installed (32 bit or 64 bit depending on your system).
+Have videos as desktop backgrounds in Windows. You need to have [VLC](https://www.videolan.org/vlc/) installed (32 bit or 64 bit depending on your system).
 
 ## Usage
 1. Download the binary zip (32 or 64 bit, depending on which VLC client you have installed) from `./dist/` and unpack, or get the source from `./src/` and compile it in Visual Studio
@@ -14,6 +14,6 @@ For example, to open an imgur mp4 as background on your second screen:
 * Adding GUI for opening video
 
 ## Disclaimer
-It works on my machine! I cannot guarantee that it works anywhere else but it kind of should.
+It works on Windows 10. If it doesn't, please let me know.
 
 Feel free to add PRs, make your own forks, or to add issues.  
