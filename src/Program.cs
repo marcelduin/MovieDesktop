@@ -187,6 +187,22 @@ namespace MovieDesktop
 
     }
 
+    private static string SelectFolder()
+    {
+      FolderBrowserDialog dialog = new FolderBrowserDialog
+      {
+        Description = "Select a folder with video files.",
+        ShowNewFolderButton = false
+      };
+
+      if (dialog.ShowDialog() == DialogResult.OK)
+      {
+        return dialog.SelectedPath;
+      }
+
+      else return "";
+    }
+
     private void SetDesktop(int screenIdx)
     {
       /// Screen part
@@ -242,18 +258,28 @@ namespace MovieDesktop
       components = new System.ComponentModel.Container();
       contextMenu = new ContextMenu();
 
-      menuOpen = new MenuItem
-      {
-        Index = 0,
-        Text = "&Open video..."
-      };
+      menuOpen = new MenuItem { Index = 0, Text = "&Open" };
 
-      menuOpen.Click += new EventHandler((s, e) =>
+      // Open file
+      var openFile = new MenuItem { Index = 0, Text = "File..." };
+      openFile.Click += new EventHandler((s, e) =>
       {
         string newFile = SelectFile();
         if (!String.IsNullOrWhiteSpace(newFile))
           Open(newFile);
       });
+      menuOpen.MenuItems.Add(openFile);
+
+      // Open folder
+      var openFolder = new MenuItem { Index = 1, Text = "Folder..." };
+      openFolder.Click += new EventHandler((s, e) =>
+      {
+        string newFile = SelectFolder();
+        if (!String.IsNullOrWhiteSpace(newFile))
+          Open(newFile);
+      });
+      menuOpen.MenuItems.Add(openFolder);
+
 
       contextMenu.MenuItems.Add(menuOpen);
 
