@@ -257,33 +257,37 @@ namespace MovieDesktop
 
       contextMenu.MenuItems.Add(menuOpen);
 
-      // Add screen selector
+      // If multiple screens, add screen selector
       var screens = Screen.AllScreens.Count();
 
-      menuScreen = new MenuItem
+      if(screens > 1)
       {
-        Index = 1,
-        Text = "Select screen"
-      };
-
-      for(int i = 0; i < screens; i++)
-      {
-        var screen = Screen.AllScreens[i];
-        var setScreen = new MenuItem
+        menuScreen = new MenuItem
         {
-          Index = i,
-          Text = (i+1).ToString() + " - " + screen.Bounds.Width + " x " + screen.Bounds.Height + (screen.Primary ? " (primary)" : "")
+          Index = 1,
+          Text = "Select screen"
         };
 
-        setScreen.Click += new EventHandler((s, e) => {
-          SetDesktop(((MenuItem)s).Index);
-        });
+        for(int i = 0; i < screens; i++)
+        {
+          var screen = Screen.AllScreens[i];
+          var setScreen = new MenuItem
+          {
+            Index = i,
+            Text = (i+1).ToString() + " - " + screen.Bounds.Width + " x " + screen.Bounds.Height + (screen.Primary ? " (primary)" : "")
+          };
 
-        menuScreen.MenuItems.Add(setScreen);
+          setScreen.Click += new EventHandler((s, e) => {
+            SetDesktop(((MenuItem)s).Index);
+          });
 
+          menuScreen.MenuItems.Add(setScreen);
+
+        }
+
+        contextMenu.MenuItems.Add(menuScreen);
       }
 
-      contextMenu.MenuItems.Add(menuScreen);
 
       // Add exit button
       menuExit = new MenuItem
