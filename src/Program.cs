@@ -15,22 +15,43 @@ namespace MovieDesktop
     static void Main(string[] args)
     {
       string source = "";
-      uint screenNum = 1;
-#if DEBUG
-      source = "https://i.imgur.com/VMb5aPE.mp4"; // Sample video
-#else
-      if (args.Length < 1 || String.IsNullOrWhiteSpace(args[0]))
+      int screenNum = Properties.Settings.Default.ScreenIdx + 1;
+
+      if (args.Length >= 1 && !String.IsNullOrWhiteSpace(args[0]))
+      {
+        source = args[0];
+      }
+      else if(!String.IsNullOrWhiteSpace(Properties.Settings.Default.VideoSrc))
+      { // Read previously selected image from settings file
+        source = Properties.Settings.Default.VideoSrc;
+      }
+      else
+      { // Displays an OpenFileDialog
+        OpenFileDialog dialog = new OpenFileDialog
+        {
+          Filter = "Video files|*.mp4;*.webm;*.avi",
+          Title = "Select Video File"
+        };
+
+        if (dialog.ShowDialog() == DialogResult.OK)
+        {
+          source = dialog.FileName;
+        }
+      }
+
+      if (String.IsNullOrWhiteSpace(source))
+      {
+        Console.Error.WriteLine("No input file or url given");
         throw new ArgumentException("No input file or url given");
+      }
 
-      source = args[0];
-
-      if (args.Length == 2) UInt32.TryParse(args[1], out screenNum);
-#endif
+      // Read the screen number from input
+      if (args.Length == 2) Int32.TryParse(args[1], out screenNum);
 
       Application.Run(new Player(source, screenNum-1).FindForm());
     }
 
-    public Player(string videoSrc, uint screenIdx = 0)
+    public Player(string videoSrc, int screenIdx = 0)
     {
       Text = "Fullscreen desktop movie";
 
@@ -56,9 +77,12 @@ namespace MovieDesktop
       VlcLibDirectory = vlcPath;
       EndInit();
 
+      // Set settings
+      Properties.Settings.Default.VideoSrc = videoSrc;
+      Properties.Settings.Default.ScreenIdx = screenIdx;
 
       // If non-url given, check if local file or dir exists
-      if (!videoSrc.StartsWith("http"))
+      if (!videoSrc.StartsWith("http") && !videoSrc.StartsWith("file://"))
       {
         FileInfo file = new FileInfo(videoSrc);
 
@@ -89,6 +113,9 @@ namespace MovieDesktop
         // Convert to file:// format
         videoSrc = new Uri(file.FullName).AbsoluteUri;
       }
+
+      // If OK, save settings
+      Properties.Settings.Default.Save();
 
       // Set media and loop infinitely (65535 instead of -1 due to a bug in some VLCs)
       SetMedia(videoSrc, new string[]{"input-repeat=65535"});
