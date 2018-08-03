@@ -7,6 +7,12 @@ using System.Text;
 using System.Windows.Forms;
 using Vlc.DotNet.Forms;
 
+
+// MovieDesktop.exe, (c) 2018, marcel@q42.nl
+// MIT License
+
+// App Icon from http://www.iconarchive.com/show/iwindows-icons-by-wwalczyszyn/Videos-Library-icon.html
+
 namespace MovieDesktop
 {
   class Player : VlcControl
