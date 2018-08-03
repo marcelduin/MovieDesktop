@@ -272,7 +272,7 @@ namespace MovieDesktop
         var setScreen = new MenuItem
         {
           Index = i,
-          Text = (i+1).ToString() + " (" + screen.Bounds.Width + " x " + screen.Bounds.Height + (screen.Primary ? ", primary" : "") + ")"
+          Text = (i+1).ToString() + " - " + screen.Bounds.Width + " x " + screen.Bounds.Height + (screen.Primary ? " (primary)" : "")
         };
 
         setScreen.Click += new EventHandler((s, e) => {
