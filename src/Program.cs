@@ -235,6 +235,10 @@ namespace MovieDesktop
       Properties.Settings.Default.ScreenIdx = screenIdx;
       Properties.Settings.Default.Save();
 
+      // Select menu item of current screen
+      foreach(MenuItem item in menuScreen.MenuItems)
+        item.Enabled = item.Index != screenIdx;
+
       // Redraw original desktop bg on prev desktop
       ResetDesktop();
 
