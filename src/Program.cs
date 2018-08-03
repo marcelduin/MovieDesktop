@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -98,19 +97,7 @@ namespace MovieDesktop
       };
 
       // When the program is exited, reset the desktop to original backgrounds
-      Application.ThreadExit += new EventHandler((s, e) =>
-      {
-        Console.WriteLine("Gracefully exiting..");
-
-        Stop();
-        Dispose();
-
-        // Reset the desktop background image to prevent frozen video or black screen on exit
-        StringBuilder sb = new StringBuilder(300);
-        SystemParametersInfo(SPI_GETDESKWALLPAPER, 300, sb, 0);
-        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, sb, 0x2);
-      });
-
+      Application.ThreadExit += new EventHandler((s, e) => Exit());
 
       // Set the desktop process as parent process
       SetParent(Handle, desktop);
@@ -120,6 +107,24 @@ namespace MovieDesktop
 
       // Open and play video
       Open(videoSrc);
+
+    }
+
+    private void Exit()
+    {
+      Console.WriteLine("Gracefully exiting..");
+
+      // Stop any playing video
+      Stop();
+
+      // Dispose of video
+      Dispose();
+
+      // Dispose tray icon
+      notifyIcon.Dispose();
+
+      // Reset the original desktop wallpaper
+      ResetDesktop();
 
     }
 
@@ -198,6 +203,18 @@ namespace MovieDesktop
       // Set settings
       Properties.Settings.Default.ScreenIdx = screenIdx;
       Properties.Settings.Default.Save();
+
+      // Redraw original desktop bg on prev desktop
+      ResetDesktop();
+
+    }
+
+    private void ResetDesktop()
+    {
+      // Reset the desktop background image to prevent frozen video or black screen on exit
+      StringBuilder sb = new StringBuilder(300);
+      SystemParametersInfo(SPI_GETDESKWALLPAPER, 300, sb, 0);
+      SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, sb, 0x2);
     }
 
 
@@ -206,26 +223,59 @@ namespace MovieDesktop
     // From https://social.msdn.microsoft.com/Forums/vstudio/en-US/0913ae1a-7efc-4d7f-a7f7-58f112c69f66/c-application-system-tray-icon?forum=csharpgeneral
     private NotifyIcon notifyIcon;
     private ContextMenu contextMenu;
-    private MenuItem menuItem;
+    private MenuItem menuExit;
+    private MenuItem menuScreen;
     private System.ComponentModel.IContainer components;
 
     private void CreateNotifyicon()
     {
       components = new System.ComponentModel.Container();
       contextMenu = new ContextMenu();
-      menuItem = new MenuItem
+
+      // Add screen selector
+      var screens = Screen.AllScreens.Count();
+
+      menuScreen = new MenuItem
       {
         Index = 0,
+        Text = "Select screen"
+      };
+
+      for(int i = 0; i < screens; i++)
+      {
+        var setScreen = new MenuItem
+        {
+          Index = i,
+          Text = (i+1).ToString()
+        };
+
+        setScreen.Click += new EventHandler((s, e) => {
+          // Close the form, which closes the application.
+          //Application.Exit();
+          var item = (MenuItem)s;
+          SetDesktop(item.Index);
+          Console.WriteLine("wheeeeee " + item.Index);
+        });
+
+        menuScreen.MenuItems.Add(setScreen);
+
+      }
+
+      contextMenu.MenuItems.Add(menuScreen);
+
+      // Add exit button
+      menuExit = new MenuItem
+      {
+        Index = 1,
         Text = "E&xit"
       };
 
-      menuItem.Click += new System.EventHandler((s,e) => {
+      menuExit.Click += new EventHandler((s,e) => {
         // Close the form, which closes the application.
         Application.Exit();
       });
 
-      // Initialize contextMenu1
-      contextMenu.MenuItems.AddRange(new MenuItem[] { menuItem });
+      contextMenu.MenuItems.Add(menuExit);
 
       // Create the NotifyIcon.
       notifyIcon = new NotifyIcon(components)
