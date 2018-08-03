@@ -38,7 +38,7 @@ namespace MovieDesktop
 
       if (String.IsNullOrWhiteSpace(source))
       {
-        Console.Error.WriteLine("No input file or url given");
+        MessageBox.Show("No input file or url given!", "Error");
         throw new ArgumentException("No input file or url given");
       }
 
@@ -46,6 +46,7 @@ namespace MovieDesktop
       if (args.Length == 2) Int32.TryParse(args[1], out screenNum);
 
       Application.Run(new Player(source, screenNum-1).FindForm());
+
     }
 
     public Player(string videoSrc, int screenIdx = 0)
@@ -56,7 +57,7 @@ namespace MovieDesktop
       var desktop = GetWorkerW();
       if(desktop == IntPtr.Zero)
       {
-        Console.Error.WriteLine("Desktop process not found.");
+        MessageBox.Show("Desktop process not found.", "Error");
         throw new Exception("Desktop process not found.");
       }
 
@@ -67,7 +68,7 @@ namespace MovieDesktop
       var vlcPath = new DirectoryInfo(isX86 ? "C:\\Program Files (x86)\\VideoLAN\\VLC" : "C:\\Program Files\\VideoLAN\\VLC");
       if (!vlcPath.Exists)
       {
-        Console.Error.WriteLine("Error: " + (isX86 ? "32-bit" : "64-bit") + " version of VLC not found on your system. Please install.");
+        MessageBox.Show((isX86 ? "32-bit" : "64-bit") + " version of VLC not found on your system. Please install.", "Error");
         throw new EntryPointNotFoundException("VLC not found on your system.");
       }
 
@@ -83,7 +84,7 @@ namespace MovieDesktop
       // Error handling
       EncounteredError += (sender, e) =>
       {
-        Console.Error.Write("An error occurred - " + e);
+        MessageBox.Show("An error occurred - " + e.ToString(), "Error");
         throw new Exception(e.ToString());
       };
 
@@ -139,7 +140,7 @@ namespace MovieDesktop
 
           if (files.Length == 0)
           {
-            Console.Error.WriteLine("No valid video files (mp4, webm, avi) found in directory!");
+            MessageBox.Show("No valid video files (mp4, webm, avi) found in directory!");
             throw new FileNotFoundException();
           }
 
@@ -150,7 +151,7 @@ namespace MovieDesktop
         }
         else if (!file.Exists)
         {
-          Console.Error.WriteLine("File doesn't exist");
+          MessageBox.Show("File doesn't exist");
           throw new FileNotFoundException("Video file doesn't exist!");
         }
 
@@ -244,7 +245,7 @@ namespace MovieDesktop
       menuOpen = new MenuItem
       {
         Index = 0,
-        Text = "Open..."
+        Text = "&Open video..."
       };
 
       menuOpen.Click += new EventHandler((s, e) =>
@@ -267,10 +268,11 @@ namespace MovieDesktop
 
       for(int i = 0; i < screens; i++)
       {
+        var screen = Screen.AllScreens[i];
         var setScreen = new MenuItem
         {
           Index = i,
-          Text = (i+1).ToString()
+          Text = (i+1).ToString() + " (" + screen.Bounds.Width + " x " + screen.Bounds.Height + (screen.Primary ? ", primary" : "") + ")"
         };
 
         setScreen.Click += new EventHandler((s, e) => {
@@ -294,6 +296,8 @@ namespace MovieDesktop
         // Close the form, which closes the application.
         Application.Exit();
       });
+
+      contextMenu.MenuItems.Add("-");
 
       contextMenu.MenuItems.Add(menuExit);
 
@@ -383,13 +387,7 @@ namespace MovieDesktop
       // Send 0x052C to Progman. This message directs Progman to spawn a
       // WorkerW behind the desktop icons. If it is already there, nothing
       // happens.
-      SendMessageTimeout(progman,
-                             0x052C,
-                             new IntPtr(0),
-                             IntPtr.Zero,
-                             SendMessageTimeoutFlags.SMTO_NORMAL,
-                             1000,
-                             out result);
+      SendMessageTimeout(progman, 0x052C, new IntPtr(0), IntPtr.Zero, SendMessageTimeoutFlags.SMTO_NORMAL, 1000, out result);
 
       IntPtr workerw = IntPtr.Zero;
 
@@ -398,18 +396,12 @@ namespace MovieDesktop
       // If we found that window, we take its next sibling and assign it to workerw.
       EnumWindows(new EnumWindowsProc((tophandle, topparamhandle) =>
       {
-        IntPtr p = FindWindowEx(tophandle,
-                                    IntPtr.Zero,
-                                    "SHELLDLL_DefView",
-                                    "");
+        IntPtr p = FindWindowEx(tophandle, IntPtr.Zero, "SHELLDLL_DefView", "");
 
         if (p != IntPtr.Zero)
         {
           // Gets the WorkerW Window after the current one.
-          workerw = FindWindowEx(IntPtr.Zero,
-                                     tophandle,
-                                     "WorkerW",
-                                     "");
+          workerw = FindWindowEx(IntPtr.Zero, tophandle, "WorkerW", "");
         }
 
         return true;
