@@ -125,6 +125,7 @@ namespace MovieDesktop
       Stop();
 
       Properties.Settings.Default.VideoSrc = videoSrc;
+      currentPlaying.Text = videoSrc;
 
       // If non-url given, check if local file or dir exists
       if (!videoSrc.StartsWith("http") && !videoSrc.StartsWith("file://"))
@@ -203,6 +204,11 @@ namespace MovieDesktop
       else return "";
     }
 
+    private static string SelectURL()
+    {
+      return Microsoft.VisualBasic.Interaction.InputBox("Open video URL", "Enter a direct video URL (mp4, webm file)", "", 0, 0);
+    }
+
     private void SetDesktop(int screenIdx)
     {
       /// Screen part
@@ -248,6 +254,7 @@ namespace MovieDesktop
     // From https://social.msdn.microsoft.com/Forums/vstudio/en-US/0913ae1a-7efc-4d7f-a7f7-58f112c69f66/c-application-system-tray-icon?forum=csharpgeneral
     private NotifyIcon notifyIcon;
     private ContextMenu contextMenu;
+    private MenuItem currentPlaying;
     private MenuItem menuOpen;
     private MenuItem menuScreen;
     private MenuItem menuExit;
@@ -257,6 +264,13 @@ namespace MovieDesktop
     {
       components = new System.ComponentModel.Container();
       contextMenu = new ContextMenu();
+
+      contextMenu.MenuItems.Add(currentPlaying = new MenuItem
+      {
+        Text = "",
+        Enabled = false
+      });
+      contextMenu.MenuItems.Add("-");
 
       menuOpen = new MenuItem { Index = 0, Text = "&Open" };
 
@@ -279,6 +293,19 @@ namespace MovieDesktop
           Open(newFile);
       });
       menuOpen.MenuItems.Add(openFolder);
+
+
+      // Open URL
+      var openUrl = new MenuItem { Index = 2, Text = "URL..." };
+      openUrl.Click += new EventHandler((s, e) =>
+      {
+
+        string newFile = SelectURL();
+        if (!String.IsNullOrWhiteSpace(newFile))
+          Open(newFile);
+      });
+      menuOpen.MenuItems.Add(openUrl);
+
 
 
       contextMenu.MenuItems.Add(menuOpen);
