@@ -31,18 +31,9 @@ namespace MovieDesktop
       { // Read previously selected image from settings file
         source = Properties.Settings.Default.VideoSrc;
       }
-      else
-      { // Displays an OpenFileDialog
-        OpenFileDialog dialog = new OpenFileDialog
-        {
-          Filter = "Video files|*.mp4;*.webm;*.avi",
-          Title = "Select Video File"
-        };
-
-        if (dialog.ShowDialog() == DialogResult.OK)
-        {
-          source = dialog.FileName;
-        }
+      else // Display an OpenFileDialog
+      {
+        source = SelectFile();
       }
 
       if (String.IsNullOrWhiteSpace(source))
@@ -178,6 +169,23 @@ namespace MovieDesktop
 
     }
 
+    private static string SelectFile()
+    {
+      OpenFileDialog dialog = new OpenFileDialog
+      {
+        Filter = "Video files|*.mp4;*.webm;*.avi",
+        Title = "Select Video File"
+      };
+
+      if (dialog.ShowDialog() == DialogResult.OK)
+      {
+        return dialog.FileName;
+      }
+
+      return "";
+
+    }
+
     private void SetDesktop(int screenIdx)
     {
       /// Screen part
@@ -223,8 +231,9 @@ namespace MovieDesktop
     // From https://social.msdn.microsoft.com/Forums/vstudio/en-US/0913ae1a-7efc-4d7f-a7f7-58f112c69f66/c-application-system-tray-icon?forum=csharpgeneral
     private NotifyIcon notifyIcon;
     private ContextMenu contextMenu;
-    private MenuItem menuExit;
+    private MenuItem menuOpen;
     private MenuItem menuScreen;
+    private MenuItem menuExit;
     private System.ComponentModel.IContainer components;
 
     private void CreateNotifyicon()
@@ -232,12 +241,27 @@ namespace MovieDesktop
       components = new System.ComponentModel.Container();
       contextMenu = new ContextMenu();
 
+      menuOpen = new MenuItem
+      {
+        Index = 0,
+        Text = "Open..."
+      };
+
+      menuOpen.Click += new EventHandler((s, e) =>
+      {
+        string newFile = SelectFile();
+        if (!String.IsNullOrWhiteSpace(newFile))
+          Open(newFile);
+      });
+
+      contextMenu.MenuItems.Add(menuOpen);
+
       // Add screen selector
       var screens = Screen.AllScreens.Count();
 
       menuScreen = new MenuItem
       {
-        Index = 0,
+        Index = 1,
         Text = "Select screen"
       };
 
@@ -250,11 +274,7 @@ namespace MovieDesktop
         };
 
         setScreen.Click += new EventHandler((s, e) => {
-          // Close the form, which closes the application.
-          //Application.Exit();
-          var item = (MenuItem)s;
-          SetDesktop(item.Index);
-          Console.WriteLine("wheeeeee " + item.Index);
+          SetDesktop(((MenuItem)s).Index);
         });
 
         menuScreen.MenuItems.Add(setScreen);
@@ -266,7 +286,7 @@ namespace MovieDesktop
       // Add exit button
       menuExit = new MenuItem
       {
-        Index = 1,
+        Index = 2,
         Text = "E&xit"
       };
 
