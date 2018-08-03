@@ -84,9 +84,50 @@ namespace MovieDesktop
       VlcLibDirectory = vlcPath;
       EndInit();
 
-      // Set settings
+      // Place tray icon
+      CreateNotifyicon();
+
+      // No audio
+      Audio.IsMute = true;
+
+      // Error handling
+      EncounteredError += (sender, e) =>
+      {
+        Console.Error.Write("An error occurred - " + e);
+        throw new Exception(e.ToString());
+      };
+
+      // When the program is exited, reset the desktop to original backgrounds
+      Application.ThreadExit += new EventHandler((s, e) =>
+      {
+        Console.WriteLine("Gracefully exiting..");
+
+        Stop();
+        Dispose();
+
+        // Reset the desktop background image to prevent frozen video or black screen on exit
+        StringBuilder sb = new StringBuilder(300);
+        SystemParametersInfo(SPI_GETDESKWALLPAPER, 300, sb, 0);
+        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, sb, 0x2);
+      });
+
+
+      // Set the desktop process as parent process
+      SetParent(Handle, desktop);
+
+      // Set screen
+      SetDesktop(screenIdx);
+
+      // Open and play video
+      Open(videoSrc);
+
+    }
+
+    private void Open(string videoSrc)
+    {
+      Stop();
+
       Properties.Settings.Default.VideoSrc = videoSrc;
-      Properties.Settings.Default.ScreenIdx = screenIdx;
 
       // If non-url given, check if local file or dir exists
       if (!videoSrc.StartsWith("http") && !videoSrc.StartsWith("file://"))
@@ -124,22 +165,16 @@ namespace MovieDesktop
       // If OK, save settings
       Properties.Settings.Default.Save();
 
-      // Place tray icon
-      CreateNotifyicon();
-
       // Set media and loop infinitely (65535 instead of -1 due to a bug in some VLCs)
-      SetMedia(videoSrc, new string[]{"input-repeat=65535"});
+      SetMedia(videoSrc, new string[] { "input-repeat=65535" });
 
-      // No audio
-      Audio.IsMute = true;
+      // Play
+      Play();
 
-      // Error handling
-      EncounteredError += (sender, e) =>
-      {
-        Console.Error.Write("An error occurred - " + e);
-        throw new Exception(e.ToString());
-      };
+    }
 
+    private void SetDesktop(int screenIdx)
+    {
       /// Screen part
       // Try to get preferred screen, otherwise just get first
       var screen = screenIdx < Screen.AllScreens.Count() ? Screen.AllScreens[screenIdx] : Screen.AllScreens.First();
@@ -156,37 +191,13 @@ namespace MovieDesktop
         left += Math.Max(0, -s.WorkingArea.Left);
       }
 
-      // Set the desktop as parent process
-      SetParent(Handle, desktop);
-
       // Place the video on the correct screen
       Top = top;
       Left = left;
 
-      // Play
-      Play();
-
-      // Watch for ctrl+c
-      SetConsoleCtrlHandler(new HandlerRoutine(ctrlType =>
-      {
-        Application.Exit();
-        return true;
-      }), true);
-
-      // When the program is exited, reset the desktop to original backgrounds
-      Application.ThreadExit += new EventHandler((s, e) =>
-      {
-        Console.WriteLine("Gracefully exiting..");
-
-        Stop();
-        Dispose();
-
-        // Reset the desktop background image to prevent frozen video or black screen on exit
-        StringBuilder sb = new StringBuilder(300);
-        SystemParametersInfo(SPI_GETDESKWALLPAPER, 300, sb, 0);
-        SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, sb, 0x2);
-      });
-
+      // Set settings
+      Properties.Settings.Default.ScreenIdx = screenIdx;
+      Properties.Settings.Default.Save();
     }
 
 
