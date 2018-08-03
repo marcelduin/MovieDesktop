@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -123,6 +124,9 @@ namespace MovieDesktop
       // If OK, save settings
       Properties.Settings.Default.Save();
 
+      // Place tray icon
+      CreateNotifyicon();
+
       // Set media and loop infinitely (65535 instead of -1 due to a bug in some VLCs)
       SetMedia(videoSrc, new string[]{"input-repeat=65535"});
 
@@ -182,6 +186,53 @@ namespace MovieDesktop
         SystemParametersInfo(SPI_GETDESKWALLPAPER, 300, sb, 0);
         SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, sb, 0x2);
       });
+
+    }
+
+
+    /////////////////////////////////////////////////////////
+    // Tray icon
+    // From https://social.msdn.microsoft.com/Forums/vstudio/en-US/0913ae1a-7efc-4d7f-a7f7-58f112c69f66/c-application-system-tray-icon?forum=csharpgeneral
+    private NotifyIcon notifyIcon;
+    private ContextMenu contextMenu;
+    private MenuItem menuItem;
+    private System.ComponentModel.IContainer components;
+
+    private void CreateNotifyicon()
+    {
+      components = new System.ComponentModel.Container();
+      contextMenu = new ContextMenu();
+      menuItem = new MenuItem
+      {
+        Index = 0,
+        Text = "E&xit"
+      };
+
+      menuItem.Click += new System.EventHandler((s,e) => {
+        // Close the form, which closes the application.
+        Application.Exit();
+      });
+
+      // Initialize contextMenu1
+      contextMenu.MenuItems.AddRange(new MenuItem[] { menuItem });
+
+      // Create the NotifyIcon.
+      notifyIcon = new NotifyIcon(components)
+      {
+
+        // The Icon property sets the icon that will appear
+        // in the systray for this application.
+        Icon = Properties.Resources.app,
+
+        // The ContextMenu property sets the menu that will
+        // appear when the systray icon is right clicked.
+        ContextMenu = contextMenu,
+
+        // The Text property sets the text that will be displayed,
+        // in a tooltip, when the mouse hovers over the systray icon.
+        Text = "MovieDesktop",
+        Visible = true
+      };
 
     }
 
