@@ -1,14 +1,24 @@
 html {
   font-family: 'PT Sans', sans-serif;
-  background: #222;
+  background: #000;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  background: #222 linear-gradient(#333, #222) center top no-repeat;
-  background-size: 100vw 80vh;
 }
 body {
-  max-width: 920px;
+  max-width: 900px;
   margin: 0 auto;
+  padding: 0 10px;
+}
+video#background {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.3;
 }
 h1,
 h2 {
@@ -35,6 +45,10 @@ h2 {
 h3 {
   font-size: 32px;
 }
+h4 {
+  font-size: 28px;
+  margin: 30px 0 10px 0;
+}
 a[target="_blank"]:after {
   content: '';
   display: inline-block;
@@ -46,6 +60,10 @@ a[target="_blank"]:after {
 }
 a[target="_blank"]:hover:after {
   opacity: 1;
+}
+pre {
+  background: rgba(0,0,0,0.1);
+  padding: 20px;
 }
 header {
   color: #fff;
@@ -97,9 +115,10 @@ footer a[target="_blank"]:after {
 }
 section {
   box-sizing: border-box;
-  background: linear-gradient(#f6f7f3, #eee);
+  background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.85));
   padding: 20px;
-  margin-bottom: 20px;
+  max-width: 640px;
+  margin: 0 auto 120px auto;
 }
 section h2 {
   margin-top: 0;
@@ -153,9 +172,11 @@ section.dark {
   background: transparent;
   color: #fff;
   max-width: 640px;
-  margin: 0 auto;
 }
-section.dark a[target="_blank"] {
+section.dark a[target="_blank"]:after {
+  background-image: url("../img/external-white.svg");
+}
+section.dark a.paypal {
   margin: 20px;
   line-height: 33px;
   display: inline-block;
@@ -166,15 +187,22 @@ section.dark a[target="_blank"] {
   transition: box-shadow 0.25s ease, background-color 0.25s ease;
   border: 1px solid #bbb;
 }
-section.dark a[target="_blank"]:after {
+section.dark a.paypal:after {
   content: none;
 }
-section.dark a[target="_blank"]:hover {
+section.dark a.paypal:hover {
   box-shadow: 0 0 15px #ffebb3;
   background-color: #fff8e5;
 }
-section.dark a[target="_blank"] img {
+section.dark a.paypal img {
   vertical-align: middle;
+}
+section.dark.darker {
+  font-size: 120%;
+  background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,0,0,0.75));
+}
+section.dark.darker a {
+  color: #0fb;
 }
 footer {
   padding: 40px 20px 20px 20px;
