@@ -12,6 +12,13 @@ body
 
 h1
 	font-family 'Bree Serif', serif
+	font-size 72px
+	margin-bottom 16px
+	color #0fb
+	text-shadow 2px 2px 2px rgba(255,255,255,.25)
+	background linear-gradient(45deg, #0fb, #0bf)
+	-webkit-background-clip text
+	-webkit-text-fill-color transparent
 
 a
 	&[target="_blank"]
@@ -34,14 +41,6 @@ header
 	margin-bottom 32px
 
 	h1
-		font-size 72px
-		margin-bottom 16px
-		color #0fb
-		text-shadow 2px 2px 2px rgba(255,255,255,.25)
-
-		background linear-gradient(45deg, #0fb, #0bf)
-		-webkit-background-clip text
-		-webkit-text-fill-color transparent
 
 		#logo
 			width 48px
@@ -65,7 +64,8 @@ menu
 
 		li
 			display inline-block
-			margin-right 10px
+			margin 0 20px
+			text-transform uppercase
 
 menu,footer
 	a
@@ -93,6 +93,7 @@ section
 
 	h2
 		margin-top 0
+		font-size 28px
 
 	a
 		text-decoration none
@@ -132,8 +133,20 @@ section
 
 #donate
 	text-align center
+	background transparent
+	color #fff
+	max-width 640px
+	margin 0 auto
+
+	h1
+		color #f0b
+		margin-top 0
+		background linear-gradient(45deg, #f0b, #fb0)
+		-webkit-background-clip text
+		-webkit-text-fill-color transparent
 
 	a[target="_blank"]
+		margin 20px
 		line-height 33px
 		display inline-block
 		box-shadow 0 0 5px #fb0
@@ -141,6 +154,7 @@ section
 		border-radius 4px
 		background-color lighten(#fb0,35)
 		transition box-shadow .25s ease, background-color .25s ease
+		border 1px solid #bbb
 
 		&:after
 			content none
