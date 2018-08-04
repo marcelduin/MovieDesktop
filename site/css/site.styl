@@ -1,0 +1,113 @@
+html
+	font-family 'PT Sans', sans-serif
+	background #222
+	-moz-osx-font-smoothing grayscale
+	-webkit-font-smoothing antialiased
+	background #222 linear-gradient(#333, #222) center top no-repeat
+	background-size auto 80vh
+
+body
+	max-width 920px
+	margin 0 auto
+
+h1
+	font-family 'Bree Serif', serif
+
+a
+	&[target="_blank"]
+		&:after
+			content ''
+			display inline-block
+			outline 1 px solid #f00
+			width 16px
+			height 16px
+			background transparent url('../img/external.svg') center center no-repeat
+			background-size contain
+			opacity .5
+
+		&:hover:after
+			opacity 1
+
+menu
+	padding 0
+	text-align center
+
+	#logo
+		width 32px
+		height 32px
+
+	ul
+		list-style-type none
+		padding 0
+		margin 0
+
+		li
+			display inline-block
+			margin-right 10px
+
+menu,footer
+	a
+		color #fff
+		text-decoration none
+		display inline-block
+		font-weight bold
+
+		&:not(:hover)
+			opacity .75
+
+		&:hover
+			text-decoration underline
+
+		&[target="_blank"]
+			&:after
+				background-image url('../img/external-white.svg')
+
+
+header
+	color #fff
+	text-align center
+	margin-bottom 32px
+
+	h1
+		font-size 64px
+		margin-bottom 16px
+
+	h2
+		margin 0 0 10px 0
+
+
+
+section
+	box-sizing border-box
+	background linear-gradient(#F6F7F3, #EEEEEE)
+	padding 20px
+	margin-bottom 20px
+
+	h2
+		margin-top 0
+
+	a
+		text-decoration none
+
+		&:hover
+			text-decoration underline
+
+	.download
+		line-height 32px
+		margin-bottom 5px
+
+		a
+			&:before
+				content ''
+				display inline-block
+				width 32px
+				height 32px
+				vertical-align middle
+				margin-right 10px
+				background url('../img/zip2.svg') center center no-repeat
+				background-size contain
+
+footer
+	padding 40px 20px 20px 20px
+	text-align center
+	color #aaa
