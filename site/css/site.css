@@ -10,15 +10,30 @@ body {
   max-width: 920px;
   margin: 0 auto;
 }
-h1 {
+h1,
+h2 {
   font-family: 'Bree Serif', serif;
   font-size: 72px;
   margin-bottom: 16px;
-  color: #0fb;
   text-shadow: 2px 2px 2px rgba(255,255,255,0.25);
+  text-align: center;
+  color: #0fb;
   background: linear-gradient(45deg, #0fb, #0bf);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+h1#donate,
+h2#donate {
+  color: #f0b;
+  background-image: linear-gradient(45deg, #f0b, #fb0);
+}
+h2 {
+  font-size: 48px;
+  color: #f0b;
+  background-image: linear-gradient(45deg, #fb0, #0fb);
+}
+h3 {
+  font-size: 32px;
 }
 a[target="_blank"]:after {
   content: '';
@@ -43,7 +58,7 @@ header h1 #logo {
   vertical-align: -4px;
   margin-right: 4px;
 }
-header h2 {
+header h3 {
   margin: 0 0 10px 0;
 }
 menu {
@@ -96,12 +111,19 @@ section a {
 section a:hover {
   text-decoration: underline;
 }
-section .download {
-  line-height: 48px;
-  margin-bottom: 20px;
-  font-size: 120%;
+section .downloads {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 40px;
 }
-section .download a {
+section .downloads .download {
+  font-size: 120%;
+  flex: 1;
+  margin-bottom: 20px;
+  text-align: center;
+}
+section .downloads .download a {
+  line-height: 48px;
   height: 48px;
   display: inline-block;
   padding: 5px 20px;
@@ -111,8 +133,9 @@ section .download a {
   margin-right: 4px;
   color: #fff;
   font-weight: bold;
+  white-space: pre;
 }
-section .download a:before {
+section .downloads .download a:before {
   content: '';
   display: inline-block;
   width: 32px;
@@ -122,24 +145,17 @@ section .download a:before {
   background: url("../img/download.svg") center center no-repeat;
   background-size: contain;
 }
-section .download a:not(:hover):before {
+section .downloads .download a:not(:hover):before {
   opacity: 0.5;
 }
-#donate {
+section.dark {
   text-align: center;
   background: transparent;
   color: #fff;
   max-width: 640px;
   margin: 0 auto;
 }
-#donate h1 {
-  color: #f0b;
-  margin-top: 0;
-  background: linear-gradient(45deg, #f0b, #fb0);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-#donate a[target="_blank"] {
+section.dark a[target="_blank"] {
   margin: 20px;
   line-height: 33px;
   display: inline-block;
@@ -150,14 +166,14 @@ section .download a:not(:hover):before {
   transition: box-shadow 0.25s ease, background-color 0.25s ease;
   border: 1px solid #bbb;
 }
-#donate a[target="_blank"]:after {
+section.dark a[target="_blank"]:after {
   content: none;
 }
-#donate a[target="_blank"]:hover {
+section.dark a[target="_blank"]:hover {
   box-shadow: 0 0 15px #ffebb3;
   background-color: #fff8e5;
 }
-#donate a[target="_blank"] img {
+section.dark a[target="_blank"] img {
   vertical-align: middle;
 }
 footer {

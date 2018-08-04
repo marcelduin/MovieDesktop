@@ -10,15 +10,31 @@ body
 	max-width 920px
 	margin 0 auto
 
-h1
+h1,h2
 	font-family 'Bree Serif', serif
 	font-size 72px
 	margin-bottom 16px
-	color #0fb
 	text-shadow 2px 2px 2px rgba(255,255,255,.25)
+	text-align center
+	color #0fb
 	background linear-gradient(45deg, #0fb, #0bf)
-	-webkit-background-clip text
-	-webkit-text-fill-color transparent
+	-webkit-background-clip text !important
+	-webkit-text-fill-color transparent !important
+
+	&#donate
+		color #f0b
+		background-image linear-gradient(45deg, #f0b, #fb0)
+
+h2
+	font-size 48px
+	color #f0b
+	background-image linear-gradient(45deg, #fb0, #0fb)
+
+h3
+	font-size 32px
+
+
+
 
 a
 	&[target="_blank"]
@@ -48,7 +64,7 @@ header
 			vertical-align -4px
 			margin-right 4px
 
-	h2
+	h3
 		margin 0 0 10px 0
 
 
@@ -101,49 +117,49 @@ section
 		&:hover
 			text-decoration underline
 
-	.download
-		line-height 48px
-		margin-bottom 20px
-		font-size 120%
+	.downloads
+		display flex
+		flex-wrap wrap
+		margin-top 40px
 
-		a
-			height 48px
-			display inline-block
-			padding 5px 20px
-			border-radius 4px
-			box-shadow 2px 2px 4px rgba(0,0,0,.25)
-			background linear-gradient(-45deg,darken(#5d5,25),darken(#5d5,10))
-			margin-right 4px
-			color #fff
-			font-weight bold
+		.download
+			font-size 120%
+			flex 1
+			margin-bottom 20px
+			text-align center
 
-
-			&:before
-				content ''
+			a
+				line-height 48px
+				height 48px
 				display inline-block
-				width 32px
-				height 32px
-				vertical-align middle
-				margin-right 10px
-				background url('../img/download.svg') center center no-repeat
-				background-size contain
+				padding 5px 20px
+				border-radius 4px
+				box-shadow 2px 2px 4px rgba(0,0,0,.25)
+				background linear-gradient(-45deg,darken(#5d5,25),darken(#5d5,10))
+				margin-right 4px
+				color #fff
+				font-weight bold
+				white-space pre
 
-			&:not(:hover):before
-				opacity .5
+				&:before
+					content ''
+					display inline-block
+					width 32px
+					height 32px
+					vertical-align middle
+					margin-right 10px
+					background url('../img/download.svg') center center no-repeat
+					background-size contain
 
-#donate
+				&:not(:hover):before
+					opacity .5
+
+section.dark
 	text-align center
 	background transparent
 	color #fff
 	max-width 640px
 	margin 0 auto
-
-	h1
-		color #f0b
-		margin-top 0
-		background linear-gradient(45deg, #f0b, #fb0)
-		-webkit-background-clip text
-		-webkit-text-fill-color transparent
 
 	a[target="_blank"]
 		margin 20px
