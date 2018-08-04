@@ -102,10 +102,22 @@ section
 			text-decoration underline
 
 	.download
-		line-height 32px
-		margin-bottom 5px
+		line-height 48px
+		margin-bottom 20px
+		font-size 120%
 
 		a
+			height 48px
+			display inline-block
+			padding 5px 20px
+			border-radius 4px
+			box-shadow 2px 2px 4px rgba(0,0,0,.25)
+			background linear-gradient(-45deg,#4b4,#5d5)
+			margin-right 4px
+			color #fff
+			font-weight bold
+
+
 			&:before
 				content ''
 				display inline-block
@@ -113,8 +125,11 @@ section
 				height 32px
 				vertical-align middle
 				margin-right 10px
-				background url('../img/zip2.svg') center center no-repeat
+				background url('../img/download.svg') center center no-repeat
 				background-size contain
+
+			&:not(:hover):before
+				opacity .5
 
 footer
 	padding 40px 20px 20px 20px
