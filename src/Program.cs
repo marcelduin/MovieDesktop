@@ -11,8 +11,6 @@ using Vlc.DotNet.Forms;
 // MovieDesktop.exe, (c) 2018, marcel@q42.nl
 // MIT License
 
-// App Icon from http://www.iconarchive.com/show/iwindows-icons-by-wwalczyszyn/Videos-Library-icon.html
-
 namespace MovieDesktop
 {
   class Player : VlcControl
@@ -371,7 +369,7 @@ namespace MovieDesktop
 
         // The Icon property sets the icon that will appear
         // in the systray for this application.
-        Icon = Properties.Resources.app,
+        Icon = Properties.Resources.app_white,
 
         // The ContextMenu property sets the menu that will
         // appear when the systray icon is right clicked.
