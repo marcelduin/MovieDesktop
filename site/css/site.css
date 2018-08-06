@@ -82,18 +82,21 @@ header h3 {
 }
 menu {
   padding: 0;
-  text-align: center;
-  margin-bottom: 40px;
+  margin: 0 auto 30px auto;
+  max-width: 500px;
 }
 menu ul {
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
 }
 menu ul li {
-  display: inline-block;
-  margin: 0 20px;
+  display: block;
+  margin: 0 20px 10px 20px;
   text-transform: uppercase;
+  flex: 1;
+  text-align: center;
 }
 menu a,
 footer a {
@@ -141,6 +144,11 @@ section .downloads .download {
   flex: 1;
   margin-bottom: 20px;
   text-align: center;
+}
+@media screen and (max-width: 400px) {
+  section .downloads .download {
+    font-size: 80%;
+  }
 }
 section .downloads .download a {
   line-height: 48px;
