@@ -124,6 +124,7 @@ namespace MovieDesktop
 
       Properties.Settings.Default.VideoSrc = videoSrc;
       currentPlaying.Text = videoSrc;
+      shuffleNext.Visible = false;
 
       // If non-url given, check if local file or dir exists
       if (!videoSrc.StartsWith("http") && !videoSrc.StartsWith("file://"))
@@ -137,13 +138,17 @@ namespace MovieDesktop
           var allowedExtensions = new HashSet<string>(new string[] { ".mp4", ".webm", ".avi" }, StringComparer.OrdinalIgnoreCase);
           var files = Directory.EnumerateFiles(videoSrc).Where(f => allowedExtensions.Contains(Path.GetExtension(f))).ToArray();
 
-          Properties.Settings.Default.LastDirectory = file.FullName;
-
           if (files.Length == 0)
           {
             MessageBox.Show("No valid video files (mp4, webm, avi) found in directory!");
             throw new FileNotFoundException();
           }
+
+          // Remember this directory
+          Properties.Settings.Default.LastDirectory = file.FullName;
+
+          // Show the shuffle item in tray menu
+          shuffleNext.Visible = true;
 
           file = new FileInfo(files[rand.Next(files.Length)]);
 
@@ -240,7 +245,10 @@ namespace MovieDesktop
       if(menuScreen != null)
       {
         foreach(MenuItem item in menuScreen.MenuItems)
+        {
           item.Enabled = item.Index != screenIdx;
+          item.Checked = item.Index == screenIdx;
+        }
       }
 
       // Redraw original desktop bg on prev desktop
@@ -263,6 +271,7 @@ namespace MovieDesktop
     private NotifyIcon notifyIcon;
     private ContextMenu contextMenu;
     private MenuItem currentPlaying;
+    private MenuItem shuffleNext;
     private MenuItem menuOpen;
     private MenuItem menuScreen;
     private MenuItem menuExit;
@@ -278,6 +287,18 @@ namespace MovieDesktop
         Text = "",
         Enabled = false
       });
+
+      contextMenu.MenuItems.Add(shuffleNext = new MenuItem
+      {
+        Text = "Next random in directory",
+        Visible = false
+      });
+
+      shuffleNext.Click += new EventHandler((s, e) =>
+      {
+        Open(Properties.Settings.Default.LastDirectory);
+      });
+
       contextMenu.MenuItems.Add("-");
 
       menuOpen = new MenuItem { Index = 0, Text = "&Open" };
