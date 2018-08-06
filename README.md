@@ -1,4 +1,4 @@
-# MovieDesktop
+# MovieDesktop - https://moviedesktop.app
 Have videos as desktop backgrounds in Windows. You need to have [VLC](https://www.videolan.org/vlc/) installed (32 bit or 64 bit depending on your system).
 
 ## Usage
