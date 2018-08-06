@@ -137,6 +137,8 @@ namespace MovieDesktop
           var allowedExtensions = new HashSet<string>(new string[] { ".mp4", ".webm", ".avi" }, StringComparer.OrdinalIgnoreCase);
           var files = Directory.EnumerateFiles(videoSrc).Where(f => allowedExtensions.Contains(Path.GetExtension(f))).ToArray();
 
+          Properties.Settings.Default.LastDirectory = file.FullName;
+
           if (files.Length == 0)
           {
             MessageBox.Show("No valid video files (mp4, webm, avi) found in directory!");
@@ -191,7 +193,8 @@ namespace MovieDesktop
       FolderBrowserDialog dialog = new FolderBrowserDialog
       {
         Description = "Select a folder with video files.",
-        ShowNewFolderButton = false
+        ShowNewFolderButton = false,
+        SelectedPath = Properties.Settings.Default.LastDirectory
       };
 
       if (dialog.ShowDialog() == DialogResult.OK)
