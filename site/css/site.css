@@ -64,6 +64,7 @@ a[target="_blank"]:hover:after {
 pre {
   background: rgba(0,0,0,0.1);
   padding: 20px;
+  overflow-x: auto;
 }
 header {
   color: #fff;
