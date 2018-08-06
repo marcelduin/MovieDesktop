@@ -1,0 +1,212 @@
+html {
+  font-family: 'PT Sans', sans-serif;
+  background: #000;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+video#background {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.3;
+}
+h1,
+h2 {
+  font-family: 'Bree Serif', serif;
+  font-size: 72px;
+  margin-bottom: 16px;
+  text-shadow: 2px 2px 2px rgba(255,255,255,0.25);
+  text-align: center;
+  color: #0fb;
+  background: linear-gradient(45deg, #0fb, #0bf);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+h1#donate,
+h2#donate {
+  color: #f0b;
+  background-image: linear-gradient(45deg, #f0b, #fb0);
+}
+h2 {
+  font-size: 48px;
+  color: #f0b;
+  background-image: linear-gradient(45deg, #fb0, #0fb);
+}
+h3 {
+  font-size: 32px;
+}
+h4 {
+  font-size: 28px;
+  margin: 30px 0 10px 0;
+}
+a[target="_blank"]:after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: transparent url("../img/external.svg") center center no-repeat;
+  background-size: contain;
+  opacity: 0.5;
+}
+a[target="_blank"]:hover:after {
+  opacity: 1;
+}
+pre {
+  background: rgba(0,0,0,0.1);
+  padding: 20px;
+  overflow-x: auto;
+}
+header {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 32px;
+}
+header h1 #logo {
+  width: 48px;
+  height: 48px;
+  vertical-align: -4px;
+  margin-right: 4px;
+}
+header h3 {
+  margin: 0 0 10px 0;
+}
+menu {
+  padding: 0;
+  text-align: center;
+  margin-bottom: 40px;
+}
+menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+menu ul li {
+  display: inline-block;
+  margin: 0 20px;
+  text-transform: uppercase;
+}
+menu a,
+footer a {
+  color: #fff;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: bold;
+}
+menu a:not(:hover),
+footer a:not(:hover) {
+  opacity: 0.75;
+}
+menu a:hover,
+footer a:hover {
+  text-decoration: underline;
+}
+menu a[target="_blank"]:after,
+footer a[target="_blank"]:after {
+  background-image: url("../img/external-white.svg");
+}
+section {
+  box-sizing: border-box;
+  background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+  padding: 20px;
+  max-width: 640px;
+  margin: 0 auto 120px auto;
+}
+section h2 {
+  margin-top: 0;
+  font-size: 28px;
+}
+section a {
+  text-decoration: none;
+}
+section a:hover {
+  text-decoration: underline;
+}
+section .downloads {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+section .downloads .download {
+  font-size: 120%;
+  flex: 1;
+  margin-bottom: 20px;
+  text-align: center;
+}
+section .downloads .download a {
+  line-height: 48px;
+  height: 48px;
+  display: inline-block;
+  padding: 5px 20px;
+  border-radius: 4px;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+  background: linear-gradient(-45deg, #1e951e, #2ad52a);
+  margin-right: 4px;
+  color: #fff;
+  font-weight: bold;
+  white-space: pre;
+}
+section .downloads .download a:before {
+  content: '';
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  margin-right: 10px;
+  background: url("../img/download.svg") center center no-repeat;
+  background-size: contain;
+}
+section .downloads .download a:not(:hover):before {
+  opacity: 0.5;
+}
+section.dark {
+  text-align: center;
+  background: transparent;
+  color: #fff;
+  max-width: 640px;
+}
+section.dark a[target="_blank"]:after {
+  background-image: url("../img/external-white.svg");
+}
+section.dark a.paypal {
+  margin: 20px;
+  line-height: 33px;
+  display: inline-block;
+  box-shadow: 0 0 5px #fb0;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #ffebb3;
+  transition: box-shadow 0.25s ease, background-color 0.25s ease;
+  border: 1px solid #bbb;
+}
+section.dark a.paypal:after {
+  content: none;
+}
+section.dark a.paypal:hover {
+  box-shadow: 0 0 15px #ffebb3;
+  background-color: #fff8e5;
+}
+section.dark a.paypal img {
+  vertical-align: middle;
+}
+section.dark.darker {
+  font-size: 120%;
+  background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,0,0,0.75));
+}
+section.dark.darker a {
+  color: #0fb;
+}
+footer {
+  padding: 40px 20px 20px 20px;
+  text-align: center;
+  color: #aaa;
+}
