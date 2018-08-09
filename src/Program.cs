@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -15,49 +16,32 @@ namespace MovieDesktop
 {
   class Player : VlcControl
   {
+    private bool loaded = false;
+    private static int screenIndex = -1;
+
     [STAThread]
     static void Main(string[] args)
     {
       string source = "";
       int screenNum = Properties.Settings.Default.ScreenIdx + 1;
 
+      // Try read provided file / url from commandline
       if (args.Length >= 1 && !String.IsNullOrWhiteSpace(args[0]))
-      {
         source = args[0];
-      }
-      else if(!String.IsNullOrWhiteSpace(Properties.Settings.Default.VideoSrc))
-      { // Read previously selected image from settings file
-        source = Properties.Settings.Default.VideoSrc;
-      }
-      else // Display an OpenFileDialog
-      {
-        source = SelectFile();
-      }
-
-      if (String.IsNullOrWhiteSpace(source))
-      {
-        MessageBox.Show("No input file or url given!", "Error");
-        throw new ArgumentException("No input file or url given");
-      }
 
       // Read the screen number from input
-      if (args.Length == 2) Int32.TryParse(args[1], out screenNum);
+      if (args.Length == 2)
+        Int32.TryParse(args[1], out screenNum);
 
-      Application.Run(new Player(source, screenNum-1).FindForm());
+      screenIndex = screenNum - 1;
+
+      Application.Run(new Player(source).FindForm());
 
     }
 
-    public Player(string videoSrc, int screenIdx = 0)
+    public Player(string videoSrc)
     {
       Text = "Fullscreen desktop movie";
-
-      // Get the desktop process
-      var desktop = GetWorkerW();
-      if(desktop == IntPtr.Zero)
-      {
-        MessageBox.Show("Desktop process not found.", "Error");
-        throw new Exception("Desktop process not found.");
-      }
 
       // Get VLC libraries
       bool isX86 = IntPtr.Size == 4;
@@ -76,6 +60,19 @@ namespace MovieDesktop
       // Place tray icon
       CreateNotifyicon();
 
+      // If no videoSrc, try read from settings or display tray notification
+      if(String.IsNullOrWhiteSpace(videoSrc))
+      {
+        if (false && !String.IsNullOrWhiteSpace(Properties.Settings.Default.VideoSrc))
+        { // Read previously selected image from settings file
+          videoSrc = Properties.Settings.Default.VideoSrc;
+        }
+        else // Show tooltip
+        {
+          ShowTip("Select a video", "Click on the MovieDesktop icon to open a video file.");
+        }
+      }
+
       // No audio
       Audio.IsMute = true;
 
@@ -89,14 +86,11 @@ namespace MovieDesktop
       // When the program is exited, reset the desktop to original backgrounds
       Application.ThreadExit += new EventHandler((s, e) => Exit());
 
-      // Set the desktop process as parent process
-      SetParent(Handle, desktop);
-
-      // Set screen
-      SetDesktop(screenIdx);
-
-      // Open and play video
-      Open(videoSrc);
+      // Open and play video if any provided
+      if(!String.IsNullOrWhiteSpace(videoSrc))
+      {
+        Open(videoSrc);
+      }
 
     }
 
@@ -120,6 +114,26 @@ namespace MovieDesktop
 
     private void Open(string videoSrc)
     {
+      if(!loaded)
+      {
+        // Get the desktop process
+        var desktop = GetWorkerW();
+        if (desktop == IntPtr.Zero)
+        {
+          MessageBox.Show("Desktop process not found.", "Error");
+          throw new Exception("Desktop process not found.");
+        }
+
+        // Set the desktop process as parent process
+        SetParent(Handle, desktop);
+
+        // Set screen
+        SetDesktop(screenIndex);
+
+        loaded = true;
+      }
+
+      // Stop any running video
       Stop();
 
       Properties.Settings.Default.VideoSrc = videoSrc;
@@ -284,7 +298,7 @@ namespace MovieDesktop
 
       contextMenu.MenuItems.Add(currentPlaying = new MenuItem
       {
-        Text = "",
+        Text = "MovieDesktop",
         Enabled = false
       });
 
@@ -405,6 +419,14 @@ namespace MovieDesktop
         Visible = true
       };
 
+    }
+
+    private void ShowTip(string title, string body)
+    {
+      Console.WriteLine("ok.......");
+      notifyIcon.BalloonTipTitle = title;
+      notifyIcon.BalloonTipText = body;
+      notifyIcon.ShowBalloonTip(10000);
     }
 
 
