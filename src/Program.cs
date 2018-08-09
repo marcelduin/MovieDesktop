@@ -63,13 +63,13 @@ namespace MovieDesktop
       // If no videoSrc, try read from settings or display tray notification
       if(String.IsNullOrWhiteSpace(videoSrc))
       {
-        if (false && !String.IsNullOrWhiteSpace(Properties.Settings.Default.VideoSrc))
+        if (!String.IsNullOrWhiteSpace(Properties.Settings.Default.VideoSrc))
         { // Read previously selected image from settings file
           videoSrc = Properties.Settings.Default.VideoSrc;
         }
         else // Show tooltip
         {
-          ShowTip("Select a video", "Click on the MovieDesktop icon to open a video file.");
+          ShowTip("Select a video", "Click on the MovieDesktop tray icon to open a video file.");
         }
       }
 
