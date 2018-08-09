@@ -419,6 +419,15 @@ namespace MovieDesktop
         Visible = true
       };
 
+      notifyIcon.MouseDown += new MouseEventHandler((s, e) =>
+      {
+        if (e.Button == MouseButtons.Left)
+        {
+          MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+          mi.Invoke(notifyIcon, null);
+        }
+      });
+
     }
 
     private void ShowTip(string title, string body)
